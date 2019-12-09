@@ -174,6 +174,21 @@ describe('User',
                     });
             });
 
+            it('should not add more contacts than is allowed', () => {
+                let user = new User("Novo", "", 
+                    "lastname", "password", 
+                    "email@mail.com", "0901", 
+                    generateNContacts(MAX_NUM_OF_CONTACTS));
+                let operation = () => (user.addContact(new UserContact(
+                    "Novo", "Bob", "unique@mail.com", [ "080", "090" ]
+                )));
+                expect(operation).to.throw(ConstraintViolationError)
+                    .to.include({
+                        propertyName: "Contacts",
+                        message: `Only ${MAX_NUM_OF_CONTACTS} contact(s) are allowed`
+                    });
+            });
+
             it('should create a user successfully', () => {
                 new User("f", "m", "l", "p", "email@mail.com", "t", sampleContacts);
             });

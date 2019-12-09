@@ -126,6 +126,11 @@ class User {
     }
 
     addContact(contact: UserContact) {
+        if (this.contacts.length === MAX_NUM_OF_CONTACTS) {
+            throw new ConstraintViolationError(
+                "Contacts", `Only ${MAX_NUM_OF_CONTACTS} contact(s) are allowed`
+            );
+        }
         if (this.findContactByEmail(contact.getEmail())) {
             throw new ConstraintViolationError(
                 "Contacts", "Contact already exists"
