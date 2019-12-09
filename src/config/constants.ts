@@ -3,13 +3,10 @@ import dotenv from 'dotenv';
 let env_path = process.env.ENV_PATH;
 if (env_path) {
     env_path = env_path.trim();
-} else {
-    env_path = ".env";
-}
-
-let result = dotenv.config({ path: env_path });
-if (result.error) {
-    throw result.error;
+    let result = dotenv.config({ path: env_path });
+    if (result.error) {
+        throw result.error;
+    }
 }
 
 export const DB_URL = process.env.DB_URL;
