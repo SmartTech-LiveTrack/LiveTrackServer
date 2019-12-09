@@ -20,3 +20,5 @@ export const IS_PRODUCTION_ENV = process.env.NODE_ENV === 'production';
 export const IS_TEST_ENV = process.env.NODE_ENV === 'test';
 
 export const SECRET = process.env.SECRET;
+
+export const NUM_OF_CONTACT_TELS = 2;

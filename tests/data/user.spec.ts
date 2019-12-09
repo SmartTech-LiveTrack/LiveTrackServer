@@ -1,7 +1,9 @@
 import { expect } from 'chai';
 import 'mocha';
 
-import User from '../../src/data/user';
+import { NUM_OF_CONTACT_TELS } from '../../src/config/constants';
+
+import User, { UserContact } from '../../src/data/user';
 
 import ConstraintViolationError from '../../src/errors/contraint_violation_error';
 
@@ -43,6 +45,67 @@ describe('User',
                 expect(createInvalidUser("email.com")).to.throw(ConstraintViolationError);
                 expect(createInvalidUser("email@")).to.throw(ConstraintViolationError);
                 expect(createInvalidUser("email@mail.com")).to.not.throw(ConstraintViolationError);
+            });
+
+            it('should not create a contact with missing details', () => {
+                let tels = ["080", "090"];
+                let createInvalidContact = () => new UserContact("", "lastname", "email@mail.com", tels);
+                expect(createInvalidContact).to.throw(ConstraintViolationError)
+                    .to.include({
+                        propertyName: "Firstname", 
+                        message: "Firstname is required" 
+                    });
+                createInvalidContact = () => new UserContact("firstname", "", "email@mail.com", tels);
+                expect(createInvalidContact).to.throw(ConstraintViolationError)
+                    .to.include({
+                        propertyName: "Lastname", 
+                        message: "Lastname is required" 
+                    });
+                createInvalidContact = () => new UserContact("firstname", "lastname", "", tels);
+                expect(createInvalidContact).to.throw(ConstraintViolationError)
+                    .to.include({
+                        propertyName: "Email", 
+                        message: "Email is required" 
+                    });
+                createInvalidContact = () => new UserContact("firstname", "lastname", "email@mail.com", undefined);
+                expect(createInvalidContact).to.throw(ConstraintViolationError)
+                    .to.include({
+                        propertyName: "Tels", 
+                        message: "Tels are required" 
+                    });
+            });
+
+            it('should not create contact with incomplete or missing numbers', () => {
+                let createInvalidContact = () => new UserContact(
+                    "firtname", "lastname", "email@mail.com", []);
+                expect(createInvalidContact).to.throw(ConstraintViolationError)
+                    .to.include({
+                        propertyName: "Tels",
+                        message: `${NUM_OF_CONTACT_TELS} phone numbers are required`
+                    });
+                createInvalidContact = () => new UserContact(
+                    "firtname", "lastname", "email@mail.com", ["080", ""]);
+                expect(createInvalidContact).to.throw(ConstraintViolationError)
+                    .to.include({
+                        propertyName: "Tels",
+                        message: `${NUM_OF_CONTACT_TELS} phone numbers are required`
+                    });
+            });
+
+            it('should not create a contact with an invalid email', () => {
+                let tels = ["080", "090"];
+                let createInvalidContact = () => new UserContact(
+                    "firtname", "lastname", "email", tels);
+                expect(createInvalidContact).to.throw(ConstraintViolationError)
+                    .to.include({
+                        propertyName: "Email",
+                        message: "Email is invalid"
+                    });
+            });
+
+            it('should create a user contact successfully', () => {
+                new UserContact(
+                    "firstname", "lastname", "email@mail.com", ["080", "090"]);
             });
 
             it('should create a user successfully', () => {

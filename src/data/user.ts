@@ -1,3 +1,5 @@
+import { NUM_OF_CONTACT_TELS } from '../config/constants';
+
 import ConstraintViolationError from "../errors/contraint_violation_error";
 
 import PasswordEncoder from "../utils/password_encoder";
@@ -122,6 +124,55 @@ class User {
         return userObj;
     }
 
+}
+
+export class UserContact {
+    firstName: string;
+    lastName: string;
+    email: string;
+    tels: Array<string>;
+
+    constructor(firstName: string, lastName: string, 
+        email: string, tels: Array<string>) { 
+            this.firstName = firstName;
+            this.lastName = lastName;
+            this.email = email;
+            this.tels = tels;
+            this.validate();
+    }
+
+    private validate() {
+        if (!checkIfExists(this.firstName)) {
+            throw new ConstraintViolationError("Firstname", "Firstname is required");
+        }
+        if (!checkIfExists(this.lastName)) {
+            throw new ConstraintViolationError("Lastname", "Lastname is required");
+        }
+        if (!checkIfExists(this.email)) {
+            throw new ConstraintViolationError("Email", "Email is required");
+        }
+        if (!checkIfValidEmail(this.email)) {
+            throw new ConstraintViolationError("Email", "Email is invalid");
+        }
+        if (!this.tels) {
+            throw new ConstraintViolationError("Tels", "Tels are required");
+        }
+        if (!checkIfArrayHasNElements(this.tels, NUM_OF_CONTACT_TELS)) {
+            throw new ConstraintViolationError(
+                "Tels", `${NUM_OF_CONTACT_TELS} phone numbers are required`);
+        }
+    }
+}
+
+const checkIfArrayHasNElements = (
+    val: Array<string>, numberOfElements: number) => {
+        if (val.length !== numberOfElements) {
+            return false;
+        }
+        for (let i = 0; i < val.length; i++) {
+            if (!checkIfExists(val[i])) return false;
+        }
+        return true;
 }
 
 const checkIfExists = (val: string | undefined) => {
