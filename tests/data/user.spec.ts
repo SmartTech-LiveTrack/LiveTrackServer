@@ -14,9 +14,21 @@ import PasswordEncoder from '../../src/utils/password_encoder';
 
 describe('User',
     () => {
-        const sampleContacts = [
-            new UserContact("firstname", "lastname", "email@mail.com", ["080", "090"])
-        ];
+        const generateNContacts = (n: number) => {
+            let contacts = [];
+            for (let i = 0; i < n; i++) {
+                contacts.push(
+                    new UserContact(
+                        "firstname", "lastname", `email${i}@mail.com`,
+                        [
+                            `080${i}`, `090${i}`
+                        ]
+                    )
+                );
+            }
+            return contacts;
+        }
+        const sampleContacts = generateNContacts(1);
 
         describe('validation test', () => {
             it('should not create a user without firstname', () => {
@@ -142,10 +154,23 @@ describe('User',
                         "080", []
                     )
                 );
+                let testMaxOperation = () => (
+                    new User(
+                        "firstname", "", "lastname",
+                        "password", "user@mail.com",
+                        "080", generateNContacts(MAX_NUM_OF_CONTACTS + 1)
+                    )
+                );
+
                 expect(testMinOperation).to.throw(ConstraintViolationError)
                     .to.include({
                         propertyName: "Contacts",
                         message: `At least ${MIN_NUM_OF_CONTACTS} contact(s) are required`
+                    });
+                expect(testMaxOperation).to.throw(ConstraintViolationError)
+                    .to.include({
+                        propertyName: "Contacts",
+                        message: `Only ${MAX_NUM_OF_CONTACTS} contact(s) are allowed`,
                     });
             });
 

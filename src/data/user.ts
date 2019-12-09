@@ -1,6 +1,7 @@
 import { 
     NUM_OF_CONTACT_TELS, 
-    MIN_NUM_OF_CONTACTS } from '../config/constants';
+    MIN_NUM_OF_CONTACTS, 
+    MAX_NUM_OF_CONTACTS} from '../config/constants';
 
 import ConstraintViolationError from "../errors/contraint_violation_error";
 
@@ -54,6 +55,10 @@ class User {
         if (this.contacts.length < MIN_NUM_OF_CONTACTS) {
             throw new ConstraintViolationError("Contacts", 
                 `At least ${MIN_NUM_OF_CONTACTS} contact(s) are required`);
+        }
+        if (this.contacts.length > MAX_NUM_OF_CONTACTS) {
+            throw new ConstraintViolationError("Contacts", 
+                `Only ${MAX_NUM_OF_CONTACTS} contact(s) are allowed`);
         }
     }
 
