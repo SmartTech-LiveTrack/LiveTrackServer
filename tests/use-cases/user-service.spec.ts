@@ -7,7 +7,7 @@ const expect = chai.expect;
 const should = chai.should();
 
 import { connect, close } from '../../src/config/db';
-import User from "../../src/data/user";
+import User, { UserContact } from "../../src/data/user";
 import { getUserService } from '../../src/use-cases';
 import { getUserRepo } from '../../src/repos';
 import ConstraintViolationError from '../../src/errors/contraint_violation_error';
@@ -31,12 +31,16 @@ describe('Add User Use Case', () => {
         await repo.deleteAll();
     });
 
+    const sampleContacts = [
+        new UserContact("firstname", "lastname", "email-contact@mail.com", ["080", "090"])
+    ];
+
     describe('validation', () => {
         it('should not add a user with an existing email', async () => {
             let user = new User(
                 "Novo", "", "Usiwoma", 
                 "password", "email@mail.com", 
-                "080");
+                "080", sampleContacts);
             await repo.save(user);
             let operation = async () => await userService.addUser(user);
             operation().should.be.rejectedWith(ConstraintViolationError);
@@ -54,7 +58,7 @@ describe('Add User Use Case', () => {
             let user = new User(
                 "Novo", "", "Usiwoma", 
                 password, email, 
-                "080");
+                "080", sampleContacts);
             user = await userService.addUser(user);
             let result: User | undefined = await userService.authenticate(
                 email, incorrectPassword);
@@ -67,7 +71,7 @@ describe('Add User Use Case', () => {
             let user = new User(
                 "Novo", "", "Usiwoma", 
                 "password", email, 
-                "080");
+                "080", sampleContacts);
 
             user = await userService.addUser(user);
             user.setEmail(newEmail);
@@ -81,7 +85,7 @@ describe('Add User Use Case', () => {
             let user = new User(
                 "Novo", "", "Usiwoma", 
                 "password", "email@mail.com", 
-                "080");
+                "080", sampleContacts);
             user = await userService.addUser(user);
             let result = repo.findByEmail(user.getEmail());
             expect(result).to.not.eq(undefined);
@@ -93,7 +97,7 @@ describe('Add User Use Case', () => {
             let user = new User(
                 "Novo", "", "Usiwoma", 
                 password, email, 
-                "080");
+                "080", sampleContacts);
             user = await userService.addUser(user);
             let result: User | undefined = await userService.authenticate(email, password);
             expect(result).to.not.eq(undefined);
@@ -107,7 +111,7 @@ describe('Add User Use Case', () => {
             let user = new User(
                 initialFirstname, "", "Usiwoma", 
                 "password", "email@mail.com", 
-                initialTel);
+                initialTel, sampleContacts);
             let oldUser = await userService.addUser(user);
             user.setId(oldUser.getId());
             user.setFirstname(newFirstname);
@@ -130,7 +134,7 @@ describe('Add User Use Case', () => {
             let user = new User(
                 "Novo", "", "Usiwoma", 
                 password, email, 
-                "080");
+                "080", sampleContacts);
             user = await userService.addUser(user);
             let result = await userService.findUserById(user._id);
             expect(result.email).to.eq(user.getEmail());

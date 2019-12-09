@@ -1,6 +1,6 @@
 import HttpStatus from 'http-status-codes';
 
-import User from '../data/user';
+import User, { UserContact } from '../data/user';
 
 import ApiResponse from '../models/api-response';
 
@@ -20,13 +20,25 @@ class UserController {
     async postUser(req: RequestEntity<UserSignup>):
         Promise<ResponseEntity<ApiResponse<UserResponse>>> {
         let body = req.body;
+        let contacts = [];
+        if (body.contacts) {
+            contacts = body.contacts.map((contact) => (
+                new UserContact(
+                    contact.firstname,
+                    contact.lastname,
+                    contact.email,
+                    contact.tels
+                )
+            ));
+        }
         let user = new User(
             body.firstname,
             body.middlename,
             body.lastname,
             body.password,
             body.email,
-            body.tel
+            body.tel,
+            contacts
         );
         let savedUser = await this.service.addUser(user);
         let response = ApiResponse.success<UserResponse>(
