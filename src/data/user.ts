@@ -12,6 +12,7 @@ class User {
     private password: string = "";
     private email: string = "";
     private tel: string = "";
+    private contacts: Array<UserContact>;
 
     constructor(
         firstName: string, middleName: string,
@@ -24,6 +25,7 @@ class User {
         this.email = email;
         this.password = password;
         this.tel = tel;
+        this.contacts = new Array<UserContact>();
         this.validateUser();
     }
 
@@ -111,6 +113,25 @@ class User {
         this.tel = tel;
     }
 
+    addContact(contact: UserContact) {
+        if (this.findContactByEmail(contact.getEmail())) {
+            throw new ConstraintViolationError(
+                "Contacts", "Contact already exists"
+            );
+        }
+        this.contacts.push(contact);
+    }
+
+    private findContactByEmail(email: string) {
+        return this.contacts.find((contact) => (
+            contact.getEmail().toLowerCase() === email.toLowerCase()
+        ));
+    }
+
+    getContacts() {
+        return this.contacts;
+    }
+
     static fromUser(user: User) {
         let userObj = new User(
             user.firstName,
@@ -161,6 +182,22 @@ export class UserContact {
             throw new ConstraintViolationError(
                 "Tels", `${NUM_OF_CONTACT_TELS} phone numbers are required`);
         }
+    }
+
+    getFirstname() {
+        return this.firstName;
+    }
+
+    getLastname() {
+        return this.lastName;
+    }
+
+    getEmail() {
+        return this.email;
+    }
+
+    getTels() {
+        return this.tels;
     }
 }
 

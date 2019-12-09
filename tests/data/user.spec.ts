@@ -108,6 +108,19 @@ describe('User',
                     "firstname", "lastname", "email@mail.com", ["080", "090"]);
             });
 
+            it('should not add a contact that already exists', () => {
+                let contact = new UserContact(
+                    "firstname", "lastname", "email@mail.com", ["080", "090"]);
+                let user = new User("f", "m", "l", "p", "email@mail.com", "t");
+                user.addContact(contact);
+                let operation = () => user.addContact(contact);
+                expect(operation).to.throw(ConstraintViolationError)
+                    .to.include({
+                        propertyName: "Contacts",
+                        message: "Contact already exists"
+                    });
+            });
+
             it('should create a user successfully', () => {
                 new User("f", "m", "l", "p", "email@mail.com", "t");
             });
