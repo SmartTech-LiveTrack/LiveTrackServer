@@ -189,6 +189,22 @@ describe('User',
                     });
             });
 
+            it('should not remove more contacts than is allowed', () => {
+                let contacts = generateNContacts(MIN_NUM_OF_CONTACTS);
+                let contactId = "testId";
+                contacts[0]._id = contactId;
+                let user = new User("Novo", "", 
+                    "lastname", "password", 
+                    "email@mail.com", "0901", 
+                    contacts);
+                let operation = () => (user.removeContactById(contactId));
+                expect(operation).to.throw(ConstraintViolationError)
+                    .to.include({
+                        propertyName: "Contacts",
+                        message: `At least ${MIN_NUM_OF_CONTACTS} contact(s) are required`
+                    });
+            });
+
             it('should create a user successfully', () => {
                 new User("f", "m", "l", "p", "email@mail.com", "t", sampleContacts);
             });

@@ -6,6 +6,7 @@ import {
 import ConstraintViolationError from "../errors/contraint_violation_error";
 
 import PasswordEncoder from "../utils/password_encoder";
+import ResourceNotFoundError from '../errors/resource_not_found_error';
 
 class User {
     public _id: Object;
@@ -139,6 +140,27 @@ class User {
         this.contacts.push(contact);
     }
 
+    removeContactById(id: string) {
+        if (this.contacts.length === MIN_NUM_OF_CONTACTS) {
+            throw new ConstraintViolationError(
+                "Contacts", `At least ${MIN_NUM_OF_CONTACTS} contact(s) are required`
+            );
+        }
+        let contact = this.findContactById(id);
+        if (contact) {
+            this.contacts  = this.contacts
+                .filter((value) => (value.getId() === contact.getId()));
+        } else {
+            throw new ResourceNotFoundError("Contact", id);
+        }
+    }
+
+    private findContactById(id: string) {
+        return this.contacts.find((contact) => (
+            contact.getId().toString() === id
+        ));
+    }
+
     private findContactByEmail(email: string) {
         return this.contacts.find((contact) => (
             contact.getEmail().toLowerCase() === email.toLowerCase()
@@ -146,7 +168,7 @@ class User {
     }
 
     getContacts() {
-        return this.contacts;
+        return [...this.contacts];
     }
 
     static fromUser(user: User) {
@@ -166,6 +188,7 @@ class User {
 }
 
 export class UserContact {
+    public _id: Object;
     firstName: string;
     lastName: string;
     email: string;
@@ -202,6 +225,10 @@ export class UserContact {
         }
     }
 
+    getId() {
+        return this._id;
+    }
+
     getFirstname() {
         return this.firstName;
     }
@@ -215,7 +242,7 @@ export class UserContact {
     }
 
     getTels() {
-        return this.tels;
+        return [...this.tels];
     }
 }
 
