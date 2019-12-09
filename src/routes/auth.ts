@@ -4,6 +4,7 @@ import passport from 'passport';
 
 import { SECRET } from '../config/constants';
 import User from '../data/user';
+import { authenticate } from '../middleware/auth';
 import ApiResponse from '../models/api-response';
 import UserResponse from '../models/user-response';
 
@@ -37,7 +38,7 @@ router.post('/login',
 );
 
 router.get('/me', 
-    passport.authenticate('jwt', { session: false }), 
+    authenticate, 
     (req, res) => {
         res.json(ApiResponse.success(
             new UserResponse(req.user as User), "Authenticated User"));
