@@ -1,4 +1,6 @@
-import { NUM_OF_CONTACT_TELS } from '../config/constants';
+import { 
+    NUM_OF_CONTACT_TELS, 
+    MIN_NUM_OF_CONTACTS } from '../config/constants';
 
 import ConstraintViolationError from "../errors/contraint_violation_error";
 
@@ -17,7 +19,8 @@ class User {
     constructor(
         firstName: string, middleName: string,
         lastName: string, password: string,
-        email: string, tel: string
+        email: string, tel: string,
+        contacts: Array<UserContact>
     ) {
         this.firstName = firstName;
         this.middleName = middleName;
@@ -25,7 +28,7 @@ class User {
         this.email = email;
         this.password = password;
         this.tel = tel;
-        this.contacts = new Array<UserContact>();
+        this.contacts = contacts;
         this.validateUser();
     }
 
@@ -47,6 +50,10 @@ class User {
         }
         if (!checkIfValidEmail(this.email)) {
             throw new ConstraintViolationError("Email", "Email is invalid")
+        }
+        if (this.contacts.length < MIN_NUM_OF_CONTACTS) {
+            throw new ConstraintViolationError("Contacts", 
+                `At least ${MIN_NUM_OF_CONTACTS} contact(s) are required`);
         }
     }
 
@@ -139,7 +146,8 @@ class User {
             user.lastName,
             user.password,
             user.email,
-            user.tel
+            user.tel,
+            user.contacts,
         );
         userObj._id = user._id;
         return userObj;

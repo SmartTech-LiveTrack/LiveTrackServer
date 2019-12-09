@@ -1,7 +1,10 @@
 import { expect } from 'chai';
 import 'mocha';
 
-import { NUM_OF_CONTACT_TELS } from '../../src/config/constants';
+import { 
+    NUM_OF_CONTACT_TELS, 
+    MIN_NUM_OF_CONTACTS, 
+    MAX_NUM_OF_CONTACTS } from '../../src/config/constants';
 
 import User, { UserContact } from '../../src/data/user';
 
@@ -11,35 +14,44 @@ import PasswordEncoder from '../../src/utils/password_encoder';
 
 describe('User',
     () => {
+        const sampleContacts = [
+            new UserContact("firstname", "lastname", "email@mail.com", ["080", "090"])
+        ];
+
         describe('validation test', () => {
             it('should not create a user without firstname', () => {
-                const createInvalidUser = () => (new User("", "m", "l","p", "q", "t"));
+                const createInvalidUser = () => (
+                    new User("", "m", "l","p", "q", "t", sampleContacts));
                 expect(createInvalidUser).to.throw(ConstraintViolationError);
             });
     
             it('should not create a user without lastname', () => {
-                const createInvalidUser = () => (new User("f", "m", "","p", "q", "t"));
+                const createInvalidUser = () => (
+                    new User("f", "m", "","p", "q", "t", sampleContacts));
                 expect(createInvalidUser).to.throw(ConstraintViolationError);
             });
 
             it('should not create a user without password', () => {
-                const createInvalidUser = () => (new User("f", "m", "l", "", "email@mail.com", "080"));
+                const createInvalidUser = () => (
+                    new User("f", "m", "l", "", "email@mail.com", "080", sampleContacts));
                 expect(createInvalidUser).to.throw(ConstraintViolationError);
             });
     
             it('should not create a user without email', () => {
-                const createInvalidUser = () => (new User("f", "m", "l","p", "", "t"));
+                const createInvalidUser = () => (
+                    new User("f", "m", "l","p", "", "t", sampleContacts));
                 expect(createInvalidUser).to.throw(ConstraintViolationError);
             });
     
             it('should not create a user without tel', () => {
-                const createInvalidUser = () => (new User("f", "m", "l", "p", "q", ""));
+                const createInvalidUser = () => (
+                    new User("f", "m", "l", "p", "q", "", sampleContacts));
                 expect(createInvalidUser).to.throw(ConstraintViolationError);
             });
     
             it('should not create a user with an invalid email', () => {
                 const createInvalidUser = (email: string) => {
-                    return () => (new User("f", "m", "l", "p", email, "t"));
+                    return () => (new User("f", "m", "l", "p", email, "t", sampleContacts));
                 };
                 expect(createInvalidUser("email")).to.throw(ConstraintViolationError);
                 expect(createInvalidUser("email.com")).to.throw(ConstraintViolationError);
@@ -110,9 +122,10 @@ describe('User',
 
             it('should not add a contact that already exists', () => {
                 let contact = new UserContact(
-                    "firstname", "lastname", "email@mail.com", ["080", "090"]);
-                let user = new User("f", "m", "l", "p", "email@mail.com", "t");
-                user.addContact(contact);
+                    "firstname", "lastname", 
+                    sampleContacts[0].getEmail(), 
+                    ["080", "090"]);
+                let user = new User("f", "m", "l", "p", "email@mail.com", "t", sampleContacts);
                 let operation = () => user.addContact(contact);
                 expect(operation).to.throw(ConstraintViolationError)
                     .to.include({
@@ -121,8 +134,23 @@ describe('User',
                     });
             });
 
+            it('should not create a user with unsupported number of contacts', () => {
+                let testMinOperation = () => (
+                    new User(
+                        "firstname", "", "lastname",
+                        "password", "user@mail.com",
+                        "080", []
+                    )
+                );
+                expect(testMinOperation).to.throw(ConstraintViolationError)
+                    .to.include({
+                        propertyName: "Contacts",
+                        message: `At least ${MIN_NUM_OF_CONTACTS} contact(s) are required`
+                    });
+            });
+
             it('should create a user successfully', () => {
-                new User("f", "m", "l", "p", "email@mail.com", "t");
+                new User("f", "m", "l", "p", "email@mail.com", "t", sampleContacts);
             });
         });
         describe('password test', () => {
@@ -130,7 +158,7 @@ describe('User',
                 let password: string = "password";
                 let wrongPassword: string = "wrongpassword";
                 let encoder = new PasswordEncoder();
-                let user = new User("f", "m", "l", password, "email@g.com", "t");
+                let user = new User("f", "m", "l", password, "email@g.com", "t", sampleContacts);
                 await user.encodePassword();
                 let hashedPassword = user.getPassword();
                 let result = await encoder.comparePassword(password, hashedPassword);
