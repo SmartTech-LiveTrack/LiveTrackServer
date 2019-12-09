@@ -4,9 +4,13 @@
   "description": "API server for LiveTrack",
   "main": "dist/src/app.js",
   "scripts": {
-    "start": "tsc && node dist/src/app.js",
+    "build-ts": "tsc",
+    "postinstall": "npm run build-ts",
+    "start": "npm run serve",
+    "serve": "node dist/src.app.js",
     "dev": "SET ENV_PATH=.env &&nodemon dist/src/app.js",
-    "test": "SET ENV_PATH=.env.test &&mocha -r ts-node/register tests/**/*.spec.ts -t 6000"
+    "test": "SET ENV_PATH=.env.test &&mocha -r ts-node/register tests/**/*.spec.ts -t 6000",
+    "watch-ts": "tsc -w"
   },
   "repository": {
     "type": "git",
