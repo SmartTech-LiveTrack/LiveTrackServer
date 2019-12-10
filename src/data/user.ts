@@ -172,16 +172,10 @@ class User {
     }
 
     static fromUser(user: User) {
-        let userObj = new User(
-            user.firstName,
-            user.middleName,
-            user.lastName,
-            user.password,
-            user.email,
-            user.tel,
-            user.contacts,
-        );
-        userObj._id = user._id;
+        let contacts = user.contacts.map(
+            (contact) => UserContact.bindPrototype(contact));
+        let userObj: User = Object.setPrototypeOf(user, User.prototype);
+        userObj.contacts = contacts;
         return userObj;
     }
 
@@ -243,6 +237,10 @@ export class UserContact {
 
     getTels() {
         return [...this.tels];
+    }
+
+    static bindPrototype(contact): UserContact {
+        return Object.setPrototypeOf(contact, UserContact.prototype);
     }
 }
 
