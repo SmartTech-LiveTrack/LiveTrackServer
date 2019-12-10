@@ -6,7 +6,7 @@ import ApiResponse from '../models/api-response';
 
 import { RequestEntity, ResponseEntity } from '../models/http';
 import { UserSignup } from '../models/user';
-import UserResponse from '../models/user-response';
+import UserResponse, { UserContactResponse } from '../models/user-response';
 
 import UserService from '../use-cases/user-service';
 
@@ -68,6 +68,24 @@ class UserController {
             statusCode,
             body: response,
         };
+    }
+
+    async postUserContact(req: RequestEntity<any>):
+        Promise<ResponseEntity<ApiResponse<UserContactResponse>>> {
+            let body = req.body;
+            let contact = new UserContact(
+                body.firstname, body.lastname, body.email, body.tels);
+            let user = req.user;
+            user.addContact(contact);
+            let updatedUser = await this.service.updateUser(user);
+            let savedContact = updatedUser.findContactByEmail(contact.getEmail());
+            let response = ApiResponse.success<UserContactResponse>(
+                new UserContactResponse(savedContact), "Contact added"
+            );
+            return {
+                statusCode: HttpStatus.OK,
+                body: response
+            }
     }
 }
 
