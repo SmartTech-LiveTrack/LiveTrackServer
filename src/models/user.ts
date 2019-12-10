@@ -5,4 +5,10 @@ export interface UserSignup {
     password: string;
     email: string;
     tel: string;
+    contacts: Array<{
+        firstname: string,
+        lastname: string,
+        email: string,
+        tels: Array<string>,
+    }> | undefined;
 }

@@ -9,8 +9,27 @@ import { addUser } from '../fixtures/user-utils';
 const should = chai.should();
 chai.use(chaiHttp);
 
+const dummyUser = {
+    firstname: "Novo",
+    lastname: "Emma",
+    password: "password",
+    email: "email@mail.com",
+    tel: "tel",
+    contacts: [
+        {
+            firstname: "Bob",
+            lastname: "Emma",
+            email: "validcontact@mail.com",
+            tels: [
+                "080", "090"
+            ]
+        }
+    ]
+};
+
 export default function (app, apiPrefix) {
     apiPrefix += "auth/";
+
     describe('Auth Api', () => {
         let userRepo;
         before(async () => {
@@ -54,16 +73,12 @@ export default function (app, apiPrefix) {
 
         describe('functionality', () => {
             it('should log the user in', (done) => {
-                const email = "email@mail.com";
-                const password = "password";
-                addUser(app,
-                    {
-                        firstname: "Novo",
-                        lastname: "Emma",
-                        password,
-                        email,
-                        tel: "tel",
-                    }, (err, res) => {
+                const email = dummyUser.email;
+                const password = dummyUser.password;
+                addUser(
+                    app,
+                    dummyUser,
+                    (err, res) => {
                         res.should.have.status(HttpStatus.OK);
                         logIn(email, password, (err, res) => {
                             res.should.have.status(HttpStatus.OK);
@@ -76,16 +91,12 @@ export default function (app, apiPrefix) {
             })
 
             it('should return the current logged in user', (done) => {
-                const email = "emma@mail.com";
-                const password = "password";
-                addUser(app,
-                    {
-                        firstname: "Novo",
-                        lastname: "Emma",
-                        password,
-                        email,
-                        tel: "tel",
-                    }, (err, res) => {
+                const email = dummyUser.email;
+                const password = dummyUser.password;
+                addUser(
+                    app,
+                    dummyUser,
+                    (err, res) => {
                         res.should.have.status(HttpStatus.OK);
                         logIn(email, password, (err, res) => {
                             res.should.have.status(HttpStatus.OK);

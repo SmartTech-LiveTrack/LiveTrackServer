@@ -36,12 +36,12 @@ function logRequestInDev(req, res, next) {
 }
 
 function logErrorInProduction(err, req, res, next) {
-    fileLogger.error(err)
+    fileLogger.error(err.message)
     next()
 }
 
 function logErrorInDev(err, req, res, next) {
-    consoleLogger.error(err)
+    consoleLogger.error(err.message)
     next()
 }
 

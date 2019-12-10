@@ -1,12 +1,12 @@
 import HttpStatus from 'http-status-codes';
 
-import User from '../data/user';
+import User, { UserContact } from '../data/user';
 
 import ApiResponse from '../models/api-response';
 
 import { RequestEntity, ResponseEntity } from '../models/http';
 import { UserSignup } from '../models/user';
-import UserResponse from '../models/user-response';
+import UserResponse, { UserContactResponse } from '../models/user-response';
 
 import UserService from '../use-cases/user-service';
 
@@ -20,13 +20,25 @@ class UserController {
     async postUser(req: RequestEntity<UserSignup>):
         Promise<ResponseEntity<ApiResponse<UserResponse>>> {
         let body = req.body;
+        let contacts = [];
+        if (body.contacts) {
+            contacts = body.contacts.map((contact) => (
+                new UserContact(
+                    contact.firstname,
+                    contact.lastname,
+                    contact.email,
+                    contact.tels
+                )
+            ));
+        }
         let user = new User(
             body.firstname,
             body.middlename,
             body.lastname,
             body.password,
             body.email,
-            body.tel
+            body.tel,
+            contacts
         );
         let savedUser = await this.service.addUser(user);
         let response = ApiResponse.success<UserResponse>(
@@ -56,6 +68,24 @@ class UserController {
             statusCode,
             body: response,
         };
+    }
+
+    async postUserContact(req: RequestEntity<any>):
+        Promise<ResponseEntity<ApiResponse<UserContactResponse>>> {
+            let body = req.body;
+            let contact = new UserContact(
+                body.firstname, body.lastname, body.email, body.tels);
+            let user = req.user;
+            user.addContact(contact);
+            let updatedUser = await this.service.updateUser(user);
+            let savedContact = updatedUser.findContactByEmail(contact.getEmail());
+            let response = ApiResponse.success<UserContactResponse>(
+                new UserContactResponse(savedContact), "Contact added"
+            );
+            return {
+                statusCode: HttpStatus.OK,
+                body: response
+            }
     }
 }
 
