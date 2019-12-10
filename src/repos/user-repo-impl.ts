@@ -19,10 +19,7 @@ class UserRepoImpl implements UserRepository {
     }
 
     async save(user: User): Promise<User> {
-        let contacts = user.getContacts().map((contact) => {
-            contact._id = new ObjectID();
-            return contact;
-        });
+        let contacts = this.assignIdsToContact(user);
         let transformedUser = new User(
             user.getFirstname(), user.getMiddlename(),
             user.getLastname(), user.getPassword(),
@@ -36,6 +33,16 @@ class UserRepoImpl implements UserRepository {
         throw new Error("Failed to save user");
     }
 
+    assignIdsToContact(user: User) {
+        return user.getContacts()
+            .map((contact) => {
+                if (!contact._id) {
+                    contact._id = new ObjectID();
+                }
+                return contact;
+            });
+    }
+
     async findById(id: Object): Promise<User | undefined> {
         let query = { _id: new ObjectID(id.toString()) };
         let cursor: Cursor<User> = await this.db.find(query);
@@ -45,8 +52,14 @@ class UserRepoImpl implements UserRepository {
     }
 
     async update(user: User): Promise<User> {
+        let contacts = this.assignIdsToContact(user);
+        let transformedUser = new User(
+            user.getFirstname(), user.getMiddlename(),
+            user.getLastname(), user.getPassword(),
+            user.getEmail(), user.getTel(), contacts
+        );
         let result = await this.db.updateOne(
-            { _id: user._id }, { $set: user });
+            { _id: user._id }, { $set: transformedUser });
         if (result.modifiedCount = 1) {
             let savedUser: User = await this.findById(user._id);
             return User.fromUser(savedUser);
