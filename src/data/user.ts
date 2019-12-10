@@ -172,8 +172,11 @@ class User {
     }
 
     static fromUser(user: User) {
-        let contacts = user.contacts.map(
-            (contact) => UserContact.bindPrototype(contact));
+        let contacts = [];
+        if (user.contacts) {
+            contacts = user.contacts.map(
+                (contact) => UserContact.bindPrototype(contact));
+        }
         let userObj: User = Object.setPrototypeOf(user, User.prototype);
         userObj.contacts = contacts;
         return userObj;
