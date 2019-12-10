@@ -4,6 +4,7 @@ import 'mocha';
 import HttpStatus from 'http-status-codes';
 
 import { getUserRepo } from '../../src/repos';
+import { addAndAuthenticate } from '../fixtures/auth-utils';
 import { addUser } from '../fixtures/user-utils';
 
 const should = chai.should();
@@ -70,6 +71,31 @@ export default function (app, apiPrefix) {
                                 res.should.have.status(HttpStatus.OK);
                                 res.body.should.have.property('data');
                                 res.body.data.should.have.property('email').eq(email);
+                                done();
+                            });
+                    });
+            });
+
+            it('should add a new contact to a user', (done) => {
+                const email = 'dare@mail.com';
+                addAndAuthenticate(
+                    app,
+                    dummyUser,
+                    (user, token) => {
+                        let userId = user._id;
+                        chai.request(app)
+                            .post(`${apiPrefix}contacts/`)
+                            .set("Authorization", `bearer ${token}`)
+                            .send({
+                                firstname: 'lade',
+                                lastname: 'dare',
+                                email,
+                                tels: ["080", "090"]
+                            })
+                            .end((err, res) => {
+                                res.should.have.status(HttpStatus.OK);
+                                res.body.data.should.have.property("_id").not.eq(undefined);
+                                res.body.data.should.have.property("email").eq(email);
                                 done();
                             });
                     });
