@@ -161,7 +161,7 @@ class User {
         ));
     }
 
-    private findContactByEmail(email: string) {
+    findContactByEmail(email: string) {
         return this.contacts.find((contact) => (
             contact.getEmail().toLowerCase() === email.toLowerCase()
         ));
