@@ -1,3 +1,5 @@
+import HttpStatus from 'http-status-codes';
+
 import ApiError from './api_error';
 
 class ConstraintViolationError extends ApiError {
@@ -5,7 +7,7 @@ class ConstraintViolationError extends ApiError {
     message: string;
 
     constructor(propertyName: string, message?: string) {
-        super(400, "Illegal input");
+        super(HttpStatus.BAD_REQUEST, "Illegal input");
         Object.setPrototypeOf(this, new.target.prototype);
         this.propertyName = propertyName;
         this.message = message;
