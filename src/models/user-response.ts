@@ -5,9 +5,15 @@ class UserResponse {
     public firstname?: string;
     public middlename?: string;
     public lastname?: string;
-    public password?: string;
     public email?: string;
     public tel?: string;
+    public contacts?: Array<{
+        _id: string,
+        firstname: string,
+        lastname: string,
+        email: string,
+        tels: Array<string>
+    }>;
 
     constructor(user: User) {
         this._id = user._id.toString();
@@ -16,6 +22,14 @@ class UserResponse {
         this.middlename = user.getMiddlename();
         this.email = user.getEmail();
         this.tel = user.getTel();
+        this.contacts = user.getContacts()
+            .map((contact) => ({
+                _id: contact._id.toString(),
+                firstname: contact.getFirstname(),
+                lastname: contact.getLastname(),
+                email: contact.getEmail(),
+                tels: contact.getTels(),
+            }));
     }
 }
 
