@@ -4,10 +4,29 @@ import 'mocha';
 import HttpStatus from 'http-status-codes';
 
 import { getUserRepo } from '../../src/repos';
+import { addAndAuthenticate } from '../fixtures/auth-utils';
 import { addUser } from '../fixtures/user-utils';
 
 const should = chai.should();
 chai.use(chaiHttp);
+
+const dummyUser = {
+    firstname: "Novo",
+    lastname: "Emma",
+    password: "password",
+    email: "email@mail.com",
+    tel: "tel",
+    contacts: [
+        {
+            firstname: "Bob",
+            lastname: "Emma",
+            email: "validcontact@mail.com",
+            tels: [
+                "080", "090"
+            ]
+        }
+    ]
+};
 
 export default function (app, apiPrefix) {
     apiPrefix += "users/";
@@ -16,22 +35,17 @@ export default function (app, apiPrefix) {
         before(async () => {
             userRepo = getUserRepo();
         })
-    
+
         beforeEach(async () => {
             await userRepo.deleteAll();
         });
-    
+
         describe('functionality', () => {
             it('should add a user', (done) => {
-                const email = "email@mail.com";
-                addUser(app,
-                {
-                    firstname: "Novo",
-                    lastname: "Emma",
-                    password: "password",
-                    email,
-                    tel: "tel",
-                },
+                const email = dummyUser.email;
+                addUser(
+                    app,
+                    dummyUser,
                     (err, res) => {
                         res.should.have.status(HttpStatus.OK);
                         res.body.should.have.property('data');
@@ -39,31 +53,52 @@ export default function (app, apiPrefix) {
                         done();
                     });
             });
-    
+
             it('should authenticate a user', (done) => {
-                const email = "email@mail.com";
-                const password = "password";
-                addUser(app,
-                {
-                    firstname: "Novo",
-                    lastname: "Emma",
-                    password,
-                    email,
-                    tel: "tel",
-                }, () => {
-                    chai.request(app)
-                        .post(apiPrefix + 'authenticate')
-                        .send({
-                            email,
-                            password
-                        })
-                        .end((err, res) => {
-                            res.should.have.status(HttpStatus.OK);
-                            res.body.should.have.property('data');
-                            res.body.data.should.have.property('email').eq(email);
-                            done();
-                        });
-                });
+                const email = dummyUser.email;
+                const password = dummyUser.password;
+                addUser(
+                    app,
+                    dummyUser,
+                    () => {
+                        chai.request(app)
+                            .post(apiPrefix + 'authenticate')
+                            .send({
+                                email,
+                                password
+                            })
+                            .end((err, res) => {
+                                res.should.have.status(HttpStatus.OK);
+                                res.body.should.have.property('data');
+                                res.body.data.should.have.property('email').eq(email);
+                                done();
+                            });
+                    });
+            });
+
+            it('should add a new contact to a user', (done) => {
+                const email = 'dare@mail.com';
+                addAndAuthenticate(
+                    app,
+                    dummyUser,
+                    (user, token) => {
+                        let userId = user._id;
+                        chai.request(app)
+                            .post(`${apiPrefix}contacts/`)
+                            .set("Authorization", `bearer ${token}`)
+                            .send({
+                                firstname: 'lade',
+                                lastname: 'dare',
+                                email,
+                                tels: ["080", "090"]
+                            })
+                            .end((err, res) => {
+                                res.should.have.status(HttpStatus.OK);
+                                res.body.data.should.have.property("_id").not.eq(undefined);
+                                res.body.data.should.have.property("email").eq(email);
+                                done();
+                            });
+                    });
             });
         });
     });

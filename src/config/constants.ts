@@ -3,13 +3,10 @@ import dotenv from 'dotenv';
 let env_path = process.env.ENV_PATH;
 if (env_path) {
     env_path = env_path.trim();
-} else {
-    env_path = ".env";
-}
-
-let result = dotenv.config({ path: env_path });
-if (result.error) {
-    throw result.error;
+    let result = dotenv.config({ path: env_path });
+    if (result.error) {
+        throw result.error;
+    }
 }
 
 export const DB_URL = process.env.DB_URL;
@@ -23,3 +20,7 @@ export const IS_PRODUCTION_ENV = process.env.NODE_ENV === 'production';
 export const IS_TEST_ENV = process.env.NODE_ENV === 'test';
 
 export const SECRET = process.env.SECRET;
+
+export const NUM_OF_CONTACT_TELS = 2;
+export const MIN_NUM_OF_CONTACTS = 1;
+export const MAX_NUM_OF_CONTACTS = 10;

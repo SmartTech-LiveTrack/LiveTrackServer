@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import { getUserController } from '../controllers';
 import { RequestEntity } from '../models/http';
+import { authenticate } from '../middleware/auth';
 
 const router = Router();
 
@@ -11,8 +12,9 @@ const makeCallback = (handler: (body: RequestEntity<any>) => Promise<any>) => {
     return async (req, res, next) => {
         let body = {
             url: req.url,
-            statusCode: req.statusCode,
-            body: req.body
+            body: req.body,
+            params: req.params,
+            user: req.user,
         };
         try {
             let response = await handler(body);
@@ -26,5 +28,8 @@ const makeCallback = (handler: (body: RequestEntity<any>) => Promise<any>) => {
 
 router.post('/', makeCallback((req) => userController.postUser(req)));
 router.post('/authenticate', makeCallback((req) => userController.authenticateUser(req)));
+
+router.use(authenticate);
+router.post('/contacts/', makeCallback((req) => userController.postUserContact(req)));
 
 export default router;

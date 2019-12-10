@@ -7,8 +7,8 @@
     "build-ts": "tsc",
     "postinstall": "npm run build-ts",
     "start": "npm run serve",
-    "serve": "node dist/src.app.js",
-    "dev": "SET ENV_PATH=.env &&nodemon dist/src/app.js",
+    "serve": "node dist/src/app.js",
+    "dev": "npm run build-ts&&SET ENV_PATH=.env &&npm run serve",
     "test": "SET ENV_PATH=.env.test &&mocha -r ts-node/register tests/**/*.spec.ts -t 6000",
     "watch-ts": "tsc -w"
   },
@@ -38,7 +38,6 @@
     "chai-as-promised": "^7.1.1",
     "chai-http": "^4.3.0",
     "mocha": "^6.2.2",
-    "passport-local": "^1.0.0",
     "ts-node": "^8.5.4",
     "tslint": "^5.20.1",
     "typescript": "^3.7.2"
@@ -52,6 +51,7 @@
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.3.5",
     "passport": "^0.4.0",
+    "passport-local": "^1.0.0",
     "passport-jwt": "^4.0.0",
     "winston": "^3.2.1"
   }

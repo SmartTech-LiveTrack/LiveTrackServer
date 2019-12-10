@@ -7,11 +7,30 @@ const expect = chai.expect;
 const should = chai.should();
 
 import { connect, close } from '../../src/config/db';
-import User from "../../src/data/user";
+import User, { UserContact } from "../../src/data/user";
 import { getUserService } from '../../src/use-cases';
 import { getUserRepo } from '../../src/repos';
 import ConstraintViolationError from '../../src/errors/contraint_violation_error';
 import ResourceNotFoundError from '../../src/errors/resource_not_found_error';
+
+const dummyUser = new User(
+    "Novo",
+    "middle",
+    "Emma",
+    "password",
+    "email@mail.com",
+    "tel",
+    [
+        new UserContact(
+            "Bob",
+            "Emma",
+            "validcontact@mail.com",
+            [
+                "080", "090"
+            ]
+        )
+    ]
+);
 
 describe('Add User Use Case', () => {
     let repo;
@@ -33,10 +52,7 @@ describe('Add User Use Case', () => {
 
     describe('validation', () => {
         it('should not add a user with an existing email', async () => {
-            let user = new User(
-                "Novo", "", "Usiwoma", 
-                "password", "email@mail.com", 
-                "080");
+            let user = dummyUser;
             await repo.save(user);
             let operation = async () => await userService.addUser(user);
             operation().should.be.rejectedWith(ConstraintViolationError);
@@ -48,13 +64,10 @@ describe('Add User Use Case', () => {
         });
 
         it('should not authenticate a user with incorrect password', async () => {
-            let email: string = "email@gmail.com";
-            let password: string = "password";
+            let email: string = dummyUser.getEmail();
+            let password: string = dummyUser.getPassword();
             let incorrectPassword: string = "wrong" + password;
-            let user = new User(
-                "Novo", "", "Usiwoma", 
-                password, email, 
-                "080");
+            let user = dummyUser;
             user = await userService.addUser(user);
             let result: User | undefined = await userService.authenticate(
                 email, incorrectPassword);
@@ -62,52 +75,40 @@ describe('Add User Use Case', () => {
         });
 
         it('should not update a user\'s email', async () => {
-            let email = "email@mail.com";
+            let email = dummyUser.getEmail();
             let newEmail = "a"+email;
-            let user = new User(
-                "Novo", "", "Usiwoma", 
-                "password", email, 
-                "080");
+            let user = dummyUser;
 
-            user = await userService.addUser(user);
-            user.setEmail(newEmail);
-            let updatePromise = userService.updateUser(user);
+            let savedUser = await userService.addUser(user);
+            savedUser.setEmail(newEmail);
+            let updatePromise = userService.updateUser(savedUser);
             updatePromise.should.be.rejectedWith(ConstraintViolationError);
         })
     });
     
     describe('functionality', () => {
         it('should add a user', async () => {
-            let user = new User(
-                "Novo", "", "Usiwoma", 
-                "password", "email@mail.com", 
-                "080");
-            user = await userService.addUser(user);
-            let result = repo.findByEmail(user.getEmail());
+            let user = dummyUser;
+            let savedUser = await userService.addUser(user);
+            let result = repo.findByEmail(savedUser.getEmail());
             expect(result).to.not.eq(undefined);
         });
 
         it('should authenticate a user by email and password', async () => {
-            let email: string = "email@gmail.com";
-            let password: string = "password";
-            let user = new User(
-                "Novo", "", "Usiwoma", 
-                password, email, 
-                "080");
+            let email: string = dummyUser.getEmail();
+            let password: string = dummyUser.getPassword();
+            let user = dummyUser;
             user = await userService.addUser(user);
             let result: User | undefined = await userService.authenticate(email, password);
             expect(result).to.not.eq(undefined);
         });
 
         it('should update a user', async () => {
-            let initialFirstname = "Novo";
-            let initialTel = "080";
-            let newFirstname = "Bob";
-            let newTel = "090";
-            let user = new User(
-                initialFirstname, "", "Usiwoma", 
-                "password", "email@mail.com", 
-                initialTel);
+            let initialFirstname = dummyUser.getFirstname();
+            let initialTel = dummyUser.getTel();
+            let newFirstname = "a" + initialFirstname;
+            let newTel = initialTel + "9";
+            let user = dummyUser;
             let oldUser = await userService.addUser(user);
             user.setId(oldUser.getId());
             user.setFirstname(newFirstname);
@@ -125,12 +126,9 @@ describe('Add User Use Case', () => {
         });
 
         it('should find a user by id', async () => {
-            let email: string = "email@gmail.com";
-            let password: string = "password";
-            let user = new User(
-                "Novo", "", "Usiwoma", 
-                password, email, 
-                "080");
+            let email: string = dummyUser.getEmail();
+            let password: string = dummyUser.getPassword();
+            let user = dummyUser;
             user = await userService.addUser(user);
             let result = await userService.findUserById(user._id);
             expect(result.email).to.eq(user.getEmail());
