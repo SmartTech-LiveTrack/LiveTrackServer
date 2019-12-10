@@ -24,7 +24,7 @@ class UserResponse {
         this.tel = user.getTel();
         this.contacts = user.getContacts()
             .map((contact) => ({
-                _id: contact._id.toString(),
+                _id: contact._id as string,
                 firstname: contact.getFirstname(),
                 lastname: contact.getLastname(),
                 email: contact.getEmail(),
