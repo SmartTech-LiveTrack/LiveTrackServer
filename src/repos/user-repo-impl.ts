@@ -19,7 +19,16 @@ class UserRepoImpl implements UserRepository {
     }
 
     async save(user: User): Promise<User> {
-        let result = await this.db.insertOne(user);
+        let contacts = user.getContacts().map((contact) => {
+            contact._id = new ObjectID();
+            return contact;
+        });
+        let transformedUser = new User(
+            user.getFirstname(), user.getMiddlename(),
+            user.getLastname(), user.getPassword(),
+            user.getEmail(), user.getTel(), contacts
+        );
+        let result = await this.db.insertOne(transformedUser);
         if (result.insertedCount = 1) {
             let savedUser: User = result.ops[0] as any;
             return User.fromUser(savedUser);
