@@ -10,7 +10,8 @@
     "serve": "node dist/src/app.js",
     "dev": "npm run build-ts&&SET ENV_PATH=.env &&npm run serve",
     "test": "SET ENV_PATH=.env.test &&mocha -r ts-node/register tests/**/*.spec.ts -t 6000",
-    "watch-ts": "tsc -w"
+    "watch-ts": "tsc -w",
+    "watch-node": "SET ENV_PATH=.env &&nodemon dist/src/app.js"
   },
   "repository": {
     "type": "git",
