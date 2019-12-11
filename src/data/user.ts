@@ -4,9 +4,13 @@ import {
     MAX_NUM_OF_CONTACTS} from '../config/constants';
 
 import ConstraintViolationError from "../errors/contraint_violation_error";
+import ResourceNotFoundError from '../errors/resource_not_found_error';
 
 import PasswordEncoder from "../utils/password_encoder";
-import ResourceNotFoundError from '../errors/resource_not_found_error';
+import { 
+    checkIfArrayHasNElements, 
+    checkIfExists, 
+    checkIfValidEmail } from '../utils/validators';
 
 class User {
     public _id: Object;
@@ -245,29 +249,6 @@ export class UserContact {
     static bindPrototype(contact): UserContact {
         return Object.setPrototypeOf(contact, UserContact.prototype);
     }
-}
-
-const checkIfArrayHasNElements = (
-    val: Array<string>, numberOfElements: number) => {
-        if (val.length !== numberOfElements) {
-            return false;
-        }
-        for (let i = 0; i < val.length; i++) {
-            if (!checkIfExists(val[i])) return false;
-        }
-        return true;
-}
-
-const checkIfExists = (val: string | undefined) => {
-    if (val === null) return false;
-    if (val === undefined) return false;
-    if (val === "") return false;
-    return true;
-}
-
-const checkIfValidEmail = (val: string) => {
-    let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(val.toLowerCase());
 }
 
 export default User;
