@@ -1,6 +1,7 @@
 import express from 'express';
 import { Server } from 'http';
 import passport from 'passport';
+import HttpStatus from 'http-status-codes';
 
 import { PORT, IS_TEST_ENV } from './config/constants';
 import { connect, close as closeDb } from './config/db';
@@ -25,7 +26,7 @@ const doStartServer = async () => {
 
     app.use((err, req, res, next) => {
         if (err instanceof SyntaxError) {
-            res.status(400)
+            res.status(HttpStatus.BAD_REQUEST)
                 .json(ApiResponse.error("Invalid JSON", []));
         } else if (err instanceof ApiError ) {
             res.status(err.status)

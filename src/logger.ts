@@ -26,7 +26,7 @@ const fileLogger = winston.createLogger({
 });
 
 function logRequestInProduction(req, res, next) {
-    fileLogger.info(req.url)
+    consoleLogger.info(req.url)
     next()
 }
 
@@ -36,13 +36,13 @@ function logRequestInDev(req, res, next) {
 }
 
 function logErrorInProduction(err, req, res, next) {
-    fileLogger.error(err.message)
-    next()
+    consoleLogger.error(err.message);
+    next(err);
 }
 
 function logErrorInDev(err, req, res, next) {
-    consoleLogger.error(err.message)
-    next()
+    consoleLogger.error(err.message);
+    next(err);
 }
 
 export function logRequest(req, res, next) {

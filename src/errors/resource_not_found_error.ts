@@ -1,3 +1,5 @@
+import HttpStatus from 'http-status-codes';
+
 import ApiError from './api_error';
 
 class ResourceNotFoundError extends ApiError {
@@ -6,7 +8,7 @@ class ResourceNotFoundError extends ApiError {
 
     constructor(resourceName: string, query: string) {
         let message = `${resourceName} <${query}> not found`;
-        super(404, message);
+        super(HttpStatus.NOT_FOUND, message);
         Object.setPrototypeOf(this, new.target.prototype);
         this.resourceName = resourceName;
         this.query = query;
