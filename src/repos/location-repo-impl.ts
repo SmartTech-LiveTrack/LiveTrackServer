@@ -42,6 +42,10 @@ class LocationRepoImpl implements LocationRepository {
         }
         throw new Error("Failed to save location");
     }
+
+    async deleteAll(): Promise<void> {
+        await this.db.deleteMany({});
+    }
 }
 
 export class LocationDocumentFormat {
