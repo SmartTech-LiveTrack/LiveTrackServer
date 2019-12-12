@@ -7,6 +7,8 @@ const router = Router();
 const locationController = getLocationController();
 
 router.post('/', authenticate, makeCallback(
-    (req) => locationController.postUserLocation(req)))
+    (req) => locationController.postUserLocation(req)));
+router.get('/:from-:to', authenticate, makeCallback(
+    (req) => (null)));
 
 export default router;

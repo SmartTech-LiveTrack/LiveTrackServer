@@ -66,5 +66,22 @@ export default function (app, apiPrefix) {
                     });
             });
         });
+
+        it('should get locations within a time range', (done) => {
+            addAndAuthenticate(app, dummyUser, (user, token) => {
+                chai.request(app)
+                    .get(`${apiPrefix}/`)
+                    .set('Authorization', `bearer ${token}`)
+                    .end((err, res) => {
+                        res.should.have.status(HttpStatus.OK);
+                        // res.body.data.should.include({
+                        //     longitude: dummyLocation.longitude,
+                        //     latitude: dummyLocation.latitude,
+                        //     createdBy: user._id.toString()
+                        // });
+                        done();
+                    });
+            });
+        });
     });
 }
