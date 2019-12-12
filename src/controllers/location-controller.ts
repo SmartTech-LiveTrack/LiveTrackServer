@@ -23,7 +23,8 @@ class LocationController {
                 null, body.longitude, 
                 body.latitude, user.getId(), new Date());
             let saved = await this.locationService.logLocation(location);
-            let response = ApiResponse.success<Location>(saved, "Location successfully logged");
+            let response = ApiResponse.success<Location>(
+                saved, "Location successfully logged");
             return {
                 statusCode: HttpStatus.OK,
                 body: response,
