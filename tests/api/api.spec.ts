@@ -1,8 +1,9 @@
 import 'mocha';
 
 import getApp, { stopServer } from '../../src/app';
-import testUsers from './users.spec';
 import testAuth from './auth.spec';
+import testLocations from './locations.spec';
+import testUsers from './users.spec';
 
 const apiPrefix = "/api/v1/";
 describe("Api tests", async () => {
@@ -13,5 +14,6 @@ describe("Api tests", async () => {
     });
 
     testAuth(app, apiPrefix);
+    testLocations(app, apiPrefix);
     testUsers(app, apiPrefix);
 });

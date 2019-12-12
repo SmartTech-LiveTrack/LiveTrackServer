@@ -9,7 +9,9 @@
     "start": "npm run serve",
     "serve": "node dist/src/app.js",
     "dev": "npm run build-ts&&SET ENV_PATH=.env &&npm run serve",
-    "test": "SET ENV_PATH=.env.test &&mocha -r ts-node/register tests/**/*.spec.ts -t 6000",
+    "setup-test": "SET ENV_PATH=.env.test",
+    "test": "SET ENV_PATH=.env.test&&mocha -r ts-node/register tests/**/*.spec.ts -t 6000",
+    "test-section": "SET ENV_PATH=.env.test&&mocha -r ts-node/register -t 6000",
     "watch-ts": "tsc -w",
     "watch-node": "SET ENV_PATH=.env &&nodemon dist/src/app.js"
   },
