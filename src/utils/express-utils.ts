@@ -6,6 +6,7 @@ export const makeCallback = (handler: (body: RequestEntity<any>) => Promise<any>
             url: req.url,
             body: req.body,
             params: req.params,
+            query: req.query,
             user: req.user,
         };
         try {

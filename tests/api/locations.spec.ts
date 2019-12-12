@@ -3,6 +3,8 @@ import chaiHttp from 'chai-http';
 import 'mocha';
 import HttpStatus from 'http-status-codes';
 
+import Location from '../../src/data/location';
+
 import { getLocationRepo, getUserRepo } from '../../src/repos';
 
 import { addAndAuthenticate } from '../fixtures/auth-utils';
@@ -68,17 +70,32 @@ export default function (app, apiPrefix) {
         });
 
         it('should get locations within a time range', (done) => {
-            addAndAuthenticate(app, dummyUser, (user, token) => {
+            const dates = [
+                new Date("2019-10-10T00:00:00"), 
+                new Date("2019-10-12T00:00:00"),
+                new Date("2019-11-10T00:00:00")
+            ];
+            const testIndex = 1;
+            addAndAuthenticate(app, dummyUser, async (user, token) => {
+                for(let i = 0; i < dates.length; i++) {
+                    let date = dates[i];
+                    await locationRepo.saveLocation(new Location(
+                        null, 50.0, 50.0, user._id, date));
+                }
+                
                 chai.request(app)
-                    .get(`${apiPrefix}/`)
+                    .get(`${apiPrefix}/?from=${
+                        dates[testIndex].toUTCString()}&&to=${new Date()}`)
                     .set('Authorization', `bearer ${token}`)
                     .end((err, res) => {
                         res.should.have.status(HttpStatus.OK);
-                        // res.body.data.should.include({
-                        //     longitude: dummyLocation.longitude,
-                        //     latitude: dummyLocation.latitude,
-                        //     createdBy: user._id.toString()
-                        // });
+                        let dataLength = dates.length - testIndex;
+                        res.body.data.should.have.property('length')
+                            .to.eq(dataLength);
+                        new Date(res.body.data[0].createdAt).getTime()
+                            .should.eq(dates[testIndex].getTime());
+                        new Date(res.body.data[dataLength - 1].createdAt).getTime()
+                            .should.eq(dates[dates.length - 1].getTime());
                         done();
                     });
             });

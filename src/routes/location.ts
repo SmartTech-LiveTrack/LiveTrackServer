@@ -8,7 +8,7 @@ const locationController = getLocationController();
 
 router.post('/', authenticate, makeCallback(
     (req) => locationController.postUserLocation(req)));
-router.get('/:from-:to', authenticate, makeCallback(
-    (req) => (null)));
+router.get('/', authenticate, makeCallback(
+    (req) => locationController.findLocationsByUserFromTo(req)));
 
 export default router;

@@ -73,13 +73,17 @@ export class LocationDocumentFormat {
 
     static fromLocation(loc: Location) {
         let document = new LocationDocumentFormat();
-        document._id = loc.getId() as ObjectID;
-        if (!document._id) document._id = new ObjectID();
+        if (loc.getId()) {
+            document._id = new ObjectID(loc.getId().toString());
+        } else {
+            document._id = new ObjectID(
+                loc.getCreatedAt().getTime() / 1000);
+        }
         document.location = {
             type: "Point",
             coordinates: [loc.getLongitude(), loc.getLatitude()]
         };
-        document.createdBy = loc.getCreatedBy() as ObjectID;
+        document.createdBy = new ObjectID(loc.getCreatedBy().toString());
         return document;
     }
 }

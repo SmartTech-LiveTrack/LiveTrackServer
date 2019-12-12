@@ -14,10 +14,11 @@ class LocationService {
     }
 
     async findAllLocationsByUserFromTo(
-        userId: Object, startTime: Date, endTime?: Date) {
-            let locations = await this.findAllLocationsByUserFromTo(
-                userId, startTime, endTime);
-            return locations;
+        userId: Object, startTime: Date, endTime?: Date):
+        Promise<Array<Location>> {
+        let locations = await this.locationRepo.findAllLocationsByUserFromTo(
+            userId, startTime, endTime);
+        return locations;
     }
 }
 
