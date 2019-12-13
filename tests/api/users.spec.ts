@@ -6,6 +6,7 @@ import HttpStatus from 'http-status-codes';
 import { getUserRepo } from '../../src/repos';
 import { addAndAuthenticate } from '../fixtures/auth-utils';
 import { addUser } from '../fixtures/user-utils';
+import { putVerificationCode } from '../../src/utils/phone-number-verification';
 
 const should = chai.should();
 chai.use(chaiHttp);
@@ -49,7 +50,7 @@ export default function (app, apiPrefix) {
                     (err, res) => {
                         res.should.have.status(HttpStatus.OK);
                         res.body.should.have.property('data');
-                        res.body.data.should.have.property('email').eq(email);
+                        res.body.data.user.should.have.property('email').eq(email);
                         done();
                     });
             });
@@ -96,6 +97,25 @@ export default function (app, apiPrefix) {
                                 res.should.have.status(HttpStatus.OK);
                                 res.body.data.should.have.property("_id").not.eq(undefined);
                                 res.body.data.should.have.property("email").eq(email);
+                                done();
+                            });
+                    });
+            });
+
+            it('should verify user tel number', (done) => {
+                let requestId = "test-request";
+                let code = "codeX";
+                putVerificationCode(requestId, code);
+                addAndAuthenticate(
+                    app,
+                    dummyUser,
+                    (user, token) => {
+                        chai.request(app)
+                            .get(`${apiPrefix}verify-user-number/?` +
+                                `requestId=${requestId}&&code=${code}`)
+                            .set("Authorization", `bearer ${token}`)
+                            .end((err, res) => {
+                                res.should.have.status(HttpStatus.OK);
                                 done();
                             });
                     });

@@ -58,6 +58,10 @@ class UserRepoImpl implements UserRepository {
             user.getLastname(), user.getPassword(),
             user.getEmail(), user.getTel(), contacts
         );
+        if (user.isTelVerified()) {
+            transformedUser.verifyTel();
+        }
+        
         let result = await this.db.updateOne(
             { _id: user._id }, { $set: transformedUser });
         if (result.modifiedCount = 1) {

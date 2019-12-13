@@ -8,10 +8,15 @@ const should = chai.should();
 
 import { connect, close } from '../../src/config/db';
 import User, { UserContact } from "../../src/data/user";
-import { getUserService } from '../../src/use-cases';
-import { getUserRepo } from '../../src/repos';
+
 import ConstraintViolationError from '../../src/errors/contraint_violation_error';
 import ResourceNotFoundError from '../../src/errors/resource_not_found_error';
+
+import { getUserRepo } from '../../src/repos';
+import { getUserService } from '../../src/use-cases';
+
+import { putVerificationCode } from '../../src/utils/phone-number-verification';
+import UserService from '../../src/use-cases/user-service';
 
 const dummyUser = new User(
     "Novo",
@@ -34,7 +39,7 @@ const dummyUser = new User(
 
 describe('Add User Use Case', () => {
     let repo;
-    let userService;
+    let userService: UserService;
 
     after(async () => {
         await close();
@@ -83,7 +88,18 @@ describe('Add User Use Case', () => {
             savedUser.setEmail(newEmail);
             let updatePromise = userService.updateUser(savedUser);
             updatePromise.should.be.rejectedWith(ConstraintViolationError);
-        })
+        });
+
+        // it('should not verify user\'s number', async () => {
+        //     let savedUser = await userService.addUser(dummyUser);
+        //     let operation = userService.verifyUserNumber(
+        //         savedUser.getEmail(), "", "");
+                
+        //     expect(operation).to.eventually.throw(IllegalInputError);
+
+        //     let user = await userService.findUserById(savedUser._id);
+        //     expect(user.isTelVerified()).to.equal(false);
+        // });
     });
     
     describe('functionality', () => {
@@ -131,7 +147,18 @@ describe('Add User Use Case', () => {
             let user = dummyUser;
             user = await userService.addUser(user);
             let result = await userService.findUserById(user._id);
-            expect(result.email).to.eq(user.getEmail());
+            expect(result.getEmail()).to.eq(user.getEmail());
+        });
+
+        it('should verify a user\'s phone number', async () => {
+            let requestId = "testId";
+            let code = "text-X";
+            putVerificationCode(requestId, code);
+            let savedUser = await userService.addUser(dummyUser);
+            await userService.verifyUserNumber(
+                savedUser.getEmail(), requestId, code);
+            let user = await userService.findUserById(savedUser._id);
+            expect(user.isTelVerified()).to.equal(true);
         });
 
         xit('should get all users', () => {});

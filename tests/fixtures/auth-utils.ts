@@ -22,7 +22,7 @@ export const addAndAuthenticate = (app, user, callback: Function) => {
         user, 
         (err, res) => {
             res.should.have.status(HttpStatus.OK);
-            let savedUser = res.body.data;
+            let savedUser = res.body.data.user;
             authenticate(
                 app, 
                 user.email, 

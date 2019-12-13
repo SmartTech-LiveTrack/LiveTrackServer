@@ -10,6 +10,9 @@ import UserResponse, { UserContactResponse } from '../models/user-response';
 
 import UserService from '../use-cases/user-service';
 
+import { 
+    sendVerificationRequest } from '../utils/phone-number-verification';
+
 class UserController {
     private service: UserService;
 
@@ -18,7 +21,7 @@ class UserController {
     }
 
     async postUser(req: RequestEntity<UserSignup>):
-        Promise<ResponseEntity<ApiResponse<UserResponse>>> {
+        Promise<ResponseEntity<ApiResponse<any>>> {
         let body = req.body;
         let contacts = [];
         if (body.contacts) {
@@ -41,12 +44,25 @@ class UserController {
             contacts
         );
         let savedUser = await this.service.addUser(user);
-        let response = ApiResponse.success<UserResponse>(
-            new UserResponse(savedUser), "User created");
+        let responseBody = await this.tryToSendVerifcationCode(savedUser);
+        let response = ApiResponse.success<any>(
+            responseBody, "User created");
         return {
             statusCode: HttpStatus.OK,
             body: response,
         };
+    }
+
+    async tryToSendVerifcationCode(user: User): Promise<any> {
+        let response: any = { user: new UserResponse(user) };
+        try {
+            let verificationRequestId = 
+                await sendVerificationRequest(user.getTel());
+            response.verification_request_id = verificationRequestId;
+        } catch (e) {
+            console.log(e);
+        }
+        return response;
     }
 
     async authenticateUser(req: RequestEntity<{
@@ -86,6 +102,25 @@ class UserController {
                 statusCode: HttpStatus.OK,
                 body: response
             }
+    }
+
+    async verifyTel(req: RequestEntity<any>): 
+        Promise<ResponseEntity<ApiResponse<any>>>{
+        let user = req.user;
+        let { requestId, code } = req.query;
+        if (requestId && code) {
+            await this.service.verifyUserNumber(user.getEmail(), requestId, code);
+            return {
+                statusCode: HttpStatus.OK,
+                body: ApiResponse.success(null, "Verification Successful")
+            };
+        } else {
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                body: ApiResponse.error("RequestId and Code is required", [])
+            };
+        }
+        
     }
 }
 
