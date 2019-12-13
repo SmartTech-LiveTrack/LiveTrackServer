@@ -24,3 +24,7 @@ export const SECRET = process.env.SECRET;
 export const NUM_OF_CONTACT_TELS = 2;
 export const MIN_NUM_OF_CONTACTS = 1;
 export const MAX_NUM_OF_CONTACTS = 10;
+
+export const NEXMO_API_KEY = process.env.NEXMO_API_KEY;
+export const NEXMO_API_SECRET = process.env.NEXMO_API_SECRET;
+export const BRAND_NAME = process.env.BRAND_NAME;
