@@ -1,4 +1,4 @@
-abstract class ApiError extends Error {
+class ApiError extends Error {
     status: number;
     constructor(status: number, message: string) {
         super(message);
@@ -6,7 +6,9 @@ abstract class ApiError extends Error {
         this.status = status;
     }
 
-    abstract getErrors(): Array<any>;
+    getErrors(): Array<any> {
+        return [];
+    }
 }
 
 export default ApiError;
