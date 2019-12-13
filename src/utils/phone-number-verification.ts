@@ -30,7 +30,7 @@ const doSendVerificationRequest = (phone: string):
             number: phone,
             brand: BRAND_NAME,
         }, (err, result) => {
-            if (err) {
+            if (err || result.status !== '0') {
                 reject(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, 
                     "Failed to send verification request"));
             } else {
