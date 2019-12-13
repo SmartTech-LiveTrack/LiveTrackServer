@@ -131,6 +131,14 @@ class User {
         this.tels[0].tel = tel;
     }
 
+    isVerified(tel: string) {
+        // In the Future, Multiple numbers will
+        // be supported, this param 'tel', will be
+        // used to check the  verification status
+        // of a specific number
+        return this.tels[0].is_verified;
+    }
+
     verifyTel(tel: string) {
         // In the Future, Multiple numbers will
         // be supported, this param 'tel', will be
