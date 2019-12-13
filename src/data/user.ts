@@ -131,6 +131,13 @@ class User {
         this.tels[0].tel = tel;
     }
 
+    verifyTel(tel: string) {
+        // In the Future, Multiple numbers will
+        // be supported, this param 'tel', will be
+        // used to verify a specific number
+        this.tels[0].is_verified = true;
+    }
+
     addContact(contact: UserContact) {
         if (this.contacts.length === MAX_NUM_OF_CONTACTS) {
             throw new ConstraintViolationError(
