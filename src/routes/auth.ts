@@ -29,7 +29,8 @@ router.post('/login',
                                 email: user.getEmail(),
                             }, SECRET);
                             return res.json(ApiResponse.success(
-                                { user, token }, "Authenticated"
+                                { user: new UserResponse(user), token }, 
+                                "Authenticated"
                             ));
                     });
                 }
