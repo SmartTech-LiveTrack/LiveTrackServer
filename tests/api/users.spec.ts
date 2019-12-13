@@ -106,14 +106,15 @@ export default function (app, apiPrefix) {
                 let requestId = "test-request";
                 let code = "codeX";
                 putVerificationCode(requestId, code);
-                addAndAuthenticate(
+                addUser(
                     app,
                     dummyUser,
-                    (user, token) => {
+                    (err, res) => {
+                        res.should.have.status(HttpStatus.OK);
                         chai.request(app)
                             .get(`${apiPrefix}verify-user-number/?` +
+                                `email=${dummyUser.email}&&` +
                                 `requestId=${requestId}&&code=${code}`)
-                            .set("Authorization", `bearer ${token}`)
                             .end((err, res) => {
                                 res.should.have.status(HttpStatus.OK);
                                 done();

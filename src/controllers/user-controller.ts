@@ -106,10 +106,9 @@ class UserController {
 
     async verifyTel(req: RequestEntity<any>): 
         Promise<ResponseEntity<ApiResponse<any>>>{
-        let user = req.user;
-        let { requestId, code } = req.query;
-        if (requestId && code) {
-            await this.service.verifyUserNumber(user.getEmail(), requestId, code);
+        let { email, requestId, code } = req.query;
+        if (requestId && code && email) {
+            await this.service.verifyUserNumber(email, requestId, code);
             return {
                 statusCode: HttpStatus.OK,
                 body: ApiResponse.success(null, "Verification Successful")
@@ -117,7 +116,7 @@ class UserController {
         } else {
             return {
                 statusCode: HttpStatus.BAD_REQUEST,
-                body: ApiResponse.error("RequestId and Code is required", [])
+                body: ApiResponse.error("Email, RequestId and Code is required", [])
             };
         }
         

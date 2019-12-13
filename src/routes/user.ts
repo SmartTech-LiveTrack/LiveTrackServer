@@ -10,10 +10,10 @@ let userController = getUserController();
 
 router.post('/', makeCallback((req) => userController.postUser(req)));
 router.post('/authenticate', makeCallback((req) => userController.authenticateUser(req)));
-
-router.use(authenticate);
 router.get('/verify-user-number/', makeCallback(
     (req) => userController.verifyTel(req)));
+
+router.use(authenticate);
 router.post('/contacts/', makeCallback((req) => userController.postUserContact(req)));
 
 export default router;
