@@ -19,7 +19,8 @@ class User {
     private lastName: string = "";
     private password: string = "";
     private email: string = "";
-    private tel: string = "";
+    private tels: Array<{ 
+        tel: string, is_verified: boolean }>;
     private contacts: Array<UserContact>;
 
     constructor(
@@ -33,7 +34,7 @@ class User {
         this.lastName = lastName;
         this.email = email;
         this.password = password;
-        this.tel = tel;
+        this.tels = [{ tel: tel, is_verified: false }];
         this.contacts = contacts;
         this.validateUser();
     }
@@ -51,7 +52,7 @@ class User {
         if (!checkIfExists(this.email)) {
             throw new ConstraintViolationError("Email", "Email is required");
         }
-        if (!checkIfExists(this.tel)) {
+        if (!checkIfExists(this.tels[0].tel)) {
             throw new ConstraintViolationError("Tel", "Tel is required");
         }
         if (!checkIfValidEmail(this.email)) {
@@ -123,11 +124,11 @@ class User {
     }
 
     getTel() {
-        return this.tel;
+        return this.tels[0].tel;
     }
 
     setTel(tel: string) {
-        this.tel = tel;
+        this.tels[0].tel = tel;
     }
 
     addContact(contact: UserContact) {
