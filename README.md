@@ -13,7 +13,7 @@ We also need data on our location at particular periods or dates which is often 
 
 ## LiveTrack - Proposed Solution
 We provide a real time location tracking service via mobile devices and smart watches which and also offer an in-app accident detector 
-with ability to help report emergencies. The app works based on an alogorithm whicj=h makes its calculation from acceleration readings from device's 
+with ability to help report emergencies. The app works based on an alogorithm which makes its calculation from acceleration readings from device's 
 accelerometer and uses in-device gps for location tracking
 
 ## Our Stack
