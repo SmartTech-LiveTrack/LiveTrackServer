@@ -1,12 +1,14 @@
+import User, { UserContact } from '../data/user';
 import UserRepository  from '../repos/user-repository';
-import User from '../data/user';
 
 import ConstraintViolationError from '../errors/contraint_violation_error';
+import IllegalInputError from '../errors/illegal_input_error';
+import OperationFailedError from '../errors/operation_failed_error';
 import ResourceNotFoundError from '../errors/resource_not_found_error';
 
+import { sendSms } from '../utils/sms-utils';
 import { verifyCode, VerificationResult } from '../utils/phone-number-verification';
 import PasswordEncoder from '../utils/password_encoder';
-import IllegalInputError from '../errors/illegal_input_error';
 
 class UserService {
 
@@ -72,6 +74,27 @@ class UserService {
             throw new IllegalInputError("Code has expired");
         } else {
             throw new IllegalInputError("Verification failed");
+        }
+    }
+
+    async alertContacts(user: User) {
+        let alertMessage = `Help Me!\r\nFrom ${user.getFirstname()}`;
+        let contacts = user.getContacts();
+        for(let i = 0; i < contacts.length; i++) {
+            await this.alertContact(contacts[i], alertMessage);
+        }
+    }
+
+    async alertContact(contact: UserContact, alert: string) {
+        try {
+            await sendSms(contact.getTels()[0], alert);
+        } catch (error) {
+            try {
+                await sendSms(contact.getTels()[1], alert);
+            } catch (error) {
+                throw new OperationFailedError(
+                    `Failed to alert contact<${contact.getEmail()}>`);
+            }
         }
     }
 }

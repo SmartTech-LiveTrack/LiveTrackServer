@@ -14,6 +14,8 @@ router.get('/verify-user-number/', makeCallback(
     (req) => userController.verifyTel(req)));
 
 router.use(authenticate);
+router.get('/alert/', 
+    makeCallback((req) => userController.alertUserContacts(req)));
 router.post('/contacts/', makeCallback((req) => userController.postUserContact(req)));
 
 export default router;

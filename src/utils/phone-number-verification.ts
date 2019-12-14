@@ -1,22 +1,12 @@
 import HttpStatus from 'http-status-codes';
-import Nexmo from 'nexmo';
 
-import { 
-    NEXMO_API_KEY, 
-    NEXMO_API_SECRET, 
+import {  
     BRAND_NAME, 
     IS_TEST_ENV} from '../config/constants';
+import nexmo from '../config/nexmo';
 
 import ApiError from '../errors/api_error';
 
-let nexmo: Nexmo;
-
-if (!IS_TEST_ENV) {
-    nexmo = new Nexmo({
-        apiKey: NEXMO_API_KEY,
-        apiSecret: NEXMO_API_SECRET
-    });
-}
 
 const formatPhoneNumber = (phone: string) => {
     return phone;

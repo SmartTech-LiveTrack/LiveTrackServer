@@ -10,8 +10,9 @@ import UserResponse, { UserContactResponse } from '../models/user-response';
 
 import UserService from '../use-cases/user-service';
 
-import { 
-    sendVerificationRequest } from '../utils/phone-number-verification';
+import {
+    sendVerificationRequest
+} from '../utils/phone-number-verification';
 
 class UserController {
     private service: UserService;
@@ -56,7 +57,7 @@ class UserController {
     async tryToSendVerifcationCode(user: User): Promise<any> {
         let response: any = { user: new UserResponse(user) };
         try {
-            let verificationRequestId = 
+            let verificationRequestId =
                 await sendVerificationRequest(user.getTel());
             response.verification_request_id = verificationRequestId;
         } catch (e) {
@@ -88,24 +89,24 @@ class UserController {
 
     async postUserContact(req: RequestEntity<any>):
         Promise<ResponseEntity<ApiResponse<UserContactResponse>>> {
-            let body = req.body;
-            let contact = new UserContact(
-                body.firstname, body.lastname, body.email, body.tels);
-            let user = req.user;
-            user.addContact(contact);
-            let updatedUser = await this.service.updateUser(user);
-            let savedContact = updatedUser.findContactByEmail(contact.getEmail());
-            let response = ApiResponse.success<UserContactResponse>(
-                new UserContactResponse(savedContact), "Contact added"
-            );
-            return {
-                statusCode: HttpStatus.OK,
-                body: response
-            }
+        let body = req.body;
+        let contact = new UserContact(
+            body.firstname, body.lastname, body.email, body.tels);
+        let user = req.user;
+        user.addContact(contact);
+        let updatedUser = await this.service.updateUser(user);
+        let savedContact = updatedUser.findContactByEmail(contact.getEmail());
+        let response = ApiResponse.success<UserContactResponse>(
+            new UserContactResponse(savedContact), "Contact added"
+        );
+        return {
+            statusCode: HttpStatus.OK,
+            body: response
+        }
     }
 
-    async verifyTel(req: RequestEntity<any>): 
-        Promise<ResponseEntity<ApiResponse<any>>>{
+    async verifyTel(req: RequestEntity<any>):
+        Promise<ResponseEntity<ApiResponse<any>>> {
         let { email, requestId, code } = req.query;
         if (requestId && code && email) {
             await this.service.verifyUserNumber(email, requestId, code);
@@ -119,7 +120,18 @@ class UserController {
                 body: ApiResponse.error("Email, RequestId and Code is required", [])
             };
         }
-        
+
+    }
+
+    async alertUserContacts(req: RequestEntity<any>):
+        Promise<ResponseEntity<ApiResponse<any>>> {
+        let user = req.user;
+        await this.service.alertContacts(user);
+        let response = ApiResponse.success(null, "Alert sent");
+        return {
+            statusCode: HttpStatus.OK,
+            body: response
+        };
     }
 }
 
