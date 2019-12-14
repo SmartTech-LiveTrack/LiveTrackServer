@@ -2,6 +2,7 @@ import express from 'express';
 import { Server } from 'http';
 import passport from 'passport';
 import HttpStatus from 'http-status-codes';
+import cors from 'cors';
 
 import { PORT, IS_TEST_ENV } from './config/constants';
 import { connect, close as closeDb } from './config/db';
@@ -13,6 +14,7 @@ import './passport';
 const app = express();
 let server: Server;
 app.use(express.json());
+app.use(cors());
 app.use(passport.initialize());
 app.use(logRequest);
 
